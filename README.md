@@ -1,13 +1,89 @@
-# {project}
+# Doing Datomic 
 
 <!-- badges -->
-[![CircleCI](https://circleci.com/gh/lambdaisland/{project}.svg?style=svg)](https://circleci.com/gh/lambdaisland/{project}) [![cljdoc badge](https://cljdoc.org/badge/lambdaisland/{project})](https://cljdoc.org/d/lambdaisland/{project}) [![Clojars Project](https://img.shields.io/clojars/v/lambdaisland/{project}.svg)](https://clojars.org/lambdaisland/{project})
+
 <!-- /badges -->
 
-## License
+# Datomic MusicBrainz sample database
 
-Copyright &copy; 2020 Arne Brasseur and Contributors
+[Datomic](http://datomic.com) is a database of flexible, time-based
+facts, supporting queries and joins with elastic scalability, and ACID
+transactions.
 
-Licensed under the term of the Mozilla Public License 2.0, see LICENSE.
+[MusicBrainz](http://musicbrainz.org) is an open music encyclopedia
+that collects music metadata and makes it available to the public.
+This sample project uses the MusicBrainz dataset, but is in no way
+affiliated with or sponsored by MusicBrainz.
 
-Available under the terms of the Eclipse Public License 1.0, see LICENSE.txt
+The MusicBrainz dataset makes a great example database for learning,
+evaluating, or testing Datomic.  To create this sample database, we have
+exported the MusicBrainz distribution database as EDN data files,
+imported that data into Datomic according to the Schema described
+below, and [backed up](http://docs.datomic.com/on-prem/backup.html) that
+database.
+
+Included in this project are:
+
+* Instructions for downloading and restoring the Datomic backup to your local transactor
+* Datomic Datalog rules to be composed together to create interesting queries
+* Some sample queries as a starting point
+
+## Getting Started
+
+### Getting Datomic
+
+Follow the directs in https://docs.datomic.com/pro/releases.html to download 
+Datomic Pro and unzip it somewhere convenient.
+
+Start the transactor:
+
+    cd datomic-pro-$VERSION
+    bin/transactor config/samples/dev-transactor-template.properties
+
+### Getting the Data
+
+Next download the
+[subset of the mbrainz database](https://s3.amazonaws.com/mbrainz/datomic-mbrainz-1968-1973-backup-2017-07-20.tar)
+covering the period 1968-1973 (which the Datomic team has
+scientifically determined as being the most important period in the
+history of recorded music):
+
+    wget https://s3.amazonaws.com/mbrainz/datomic-mbrainz-1968-1973-backup-2017-07-20.tar -O mbrainz.tar
+    tar -xvf mbrainz.tar
+
+From the `datomic-pro-$VERSION` directory, [restore the backup](http://docs.datomic.com/on-prem/operation/backup.html#restoring):
+
+    # prints progress -- ~1,000 segments in restore
+    bin/datomic restore-db file:///path/to/backup/mbrainz-1968-1973 datomic:dev://localhost:4334/mbrainz-1968-1973
+### Running the examples
+
+#### From Java
+
+Fire up your favorite IDE, and configure it to use both the included
+[pom.xml](./pom.xml) and the following Java options when running:
+
+    -Xmx2g -server
+
+Then visit the [queries](//github.com/Datomic/mbrainz-sample/wiki/Queries) page.
+
+#### From Clojure
+
+Start up a Clojure REPL:
+
+    # from the root of this mbrainz-sample repo
+    lein repl
+
+Then [connect to the database and run the queries](//github.com/Datomic/mbrainz-sample/wiki/Queries).
+
+## Schema
+
+Here is a diagram of the relationships:
+
+![Mbrainz Relationships](relationships.png)
+
+For information about the schema in general, or about individual
+entities and their attributes, please see the
+[schema](//github.com/Datomic/mbrainz-sample/wiki/Schema) page in the
+wiki, or the [EDN schema](schema.edn) itself.
+
+
